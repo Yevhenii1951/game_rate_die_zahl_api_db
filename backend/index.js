@@ -29,9 +29,19 @@ app.get('/api/health', (_req, res) => {
 app.get('/api/db-check', async (_req, res) => {
 	try {
 		const result = await pool.query('SELECT NOW() as time')
-		res.json({ db: 'ok', time: result.rows[0].time, database_url_set: !!process.env.DATABASE_URL })
+		res.json({
+			db: 'ok',
+			time: result.rows[0].time,
+			database_url_set: !!process.env.DATABASE_URL,
+		})
 	} catch (err) {
-		res.status(500).json({ db: 'error', message: err.message, database_url_set: !!process.env.DATABASE_URL })
+		res
+			.status(500)
+			.json({
+				db: 'error',
+				message: err.message,
+				database_url_set: !!process.env.DATABASE_URL,
+			})
 	}
 })
 
