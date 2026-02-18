@@ -1,10 +1,8 @@
-// backend/index.js
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const { Pool } = require('pg')
 
-// ── DB connection ──────────────────────────────────────────
 const pool = new Pool({
 	user: process.env.DB_USER || 'dci-student',
 	host: process.env.DB_HOST || 'localhost',
@@ -13,18 +11,14 @@ const pool = new Pool({
 	port: Number(process.env.DB_PORT) || 5432,
 })
 
-// ── App ────────────────────────────────────────────────────
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-// ── Health check ───────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
 	res.json({ status: 'ok' })
 })
 
-// ── GET /api/highscores ────────────────────────────────────
-// Gibt Top-10 Ergebnisse zurück (Spielername, Versuche, Datum)
 app.get('/api/highscores', async (_req, res) => {
 	try {
 		const result = await pool.query(`
@@ -45,9 +39,6 @@ app.get('/api/highscores', async (_req, res) => {
 	}
 })
 
-// ── POST /api/highscores ───────────────────────────────────
-// Body: { name: string, attempts: number }
-// Legt Spieler an (falls neu) und speichert das Ergebnis
 app.post('/api/highscores', async (req, res) => {
 	const { name, attempts } = req.body
 
@@ -63,7 +54,6 @@ app.post('/api/highscores', async (req, res) => {
 	const username = name.trim()
 
 	try {
-		// Spieler upsert  (INSERT ... ON CONFLICT DO NOTHING + SELECT)
 		await pool.query(
 			`INSERT INTO players (username) VALUES ($1) ON CONFLICT (username) DO NOTHING`,
 			[username],
@@ -74,7 +64,6 @@ app.post('/api/highscores', async (req, res) => {
 		)
 		const playerId = playerResult.rows[0].id
 
-		// Ergebnis speichern
 		const insertResult = await pool.query(
 			`INSERT INTO game_results (player_id, attempts) VALUES ($1, $2) RETURNING id, attempts, played_at`,
 			[playerId, attempts],
@@ -92,7 +81,6 @@ app.post('/api/highscores', async (req, res) => {
 	}
 })
 
-// ── Start ──────────────────────────────────────────────────
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
 	console.log(`Backend läuft auf http://localhost:${PORT}`)

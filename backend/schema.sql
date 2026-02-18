@@ -1,8 +1,3 @@
--- ============================================================
--- SQL Schema for guess-number game
--- Database: guess-number
--- Run: psql -d "guess-number" -f schema.sql
--- ============================================================
 
 -- Tabelle 1: players (Spieler)
 CREATE TABLE IF NOT EXISTS players (
