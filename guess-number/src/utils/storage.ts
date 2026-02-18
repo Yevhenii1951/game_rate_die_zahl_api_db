@@ -1,7 +1,7 @@
 // src/utils/storage.ts
 // In dev: Vite proxies /api → http://localhost:3001
-// In prod: Backend muss auf demselben Host laufen oder API_BASE anpassen
-const API_BASE = '/api'
+// In prod: Use VITE_API_URL environment variable
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 export type Highscore = {
 	id?: number
