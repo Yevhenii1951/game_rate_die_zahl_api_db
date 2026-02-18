@@ -30,3 +30,9 @@ export async function saveHighscore(
 	if (!res.ok) throw new Error('Fehler beim Speichern des Ergebnisses')
 	return res.json()
 }
+
+/** Löscht alle Highscores aus der Datenbank */
+export async function resetHighscores(): Promise<void> {
+	const res = await fetch(`${API_BASE}/highscores`, { method: 'DELETE' })
+	if (!res.ok) throw new Error('Fehler beim Löschen der Highscores')
+}

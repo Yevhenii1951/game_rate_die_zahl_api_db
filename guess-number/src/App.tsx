@@ -3,7 +3,12 @@ import { useEffect, useState } from 'react'
 import { GameView } from './components/GameView'
 import { HighscoreList } from './components/HighscoreList'
 import { WinView } from './components/WinView'
-import { loadHighscores, saveHighscore, type Highscore } from './utils/storage'
+import {
+	loadHighscores,
+	resetHighscores,
+	saveHighscore,
+	type Highscore,
+} from './utils/storage'
 
 // Generator für Zufallszahl von min bis max einschließlich
 function randomInt(min: number, max: number) {
@@ -133,18 +138,16 @@ export default function App() {
 			<div style={{ textAlign: 'center', marginBottom: 24 }}>
 				<button
 					onClick={async () => {
-						console.log('Button clicked, loading highscores...')
 						try {
-							const scores = await loadHighscores()
-							console.log('Loaded highscores:', scores)
-							setHighscores(scores)
+							await resetHighscores()
+							setHighscores([])
 						} catch (err) {
-							console.error('Error loading highscores:', err)
+							console.error('Error resetting highscores:', err)
 						}
 					}}
 					style={{ padding: '10px 16px', cursor: 'pointer' }}
 				>
-					Highscores neu laden
+					Reset Highscores
 				</button>
 			</div>
 		</div>

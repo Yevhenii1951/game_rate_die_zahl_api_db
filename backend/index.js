@@ -26,25 +26,6 @@ app.get('/api/health', (_req, res) => {
 	res.json({ status: 'ok' })
 })
 
-app.get('/api/db-check', async (_req, res) => {
-	try {
-		const result = await pool.query('SELECT NOW() as time')
-		res.json({
-			db: 'ok',
-			time: result.rows[0].time,
-			database_url_set: !!process.env.DATABASE_URL,
-		})
-	} catch (err) {
-		res
-			.status(500)
-			.json({
-				db: 'error',
-				message: err.message,
-				database_url_set: !!process.env.DATABASE_URL,
-			})
-	}
-})
-
 app.get('/api/highscores', async (_req, res) => {
 	try {
 		const result = await pool.query(`
@@ -101,6 +82,17 @@ app.post('/api/highscores', async (req, res) => {
 			attempts: insertResult.rows[0].attempts,
 			date: insertResult.rows[0].played_at,
 		})
+	} catch (err) {
+		console.error(err)
+		res.status(500).json({ error: 'Database error' })
+	}
+})
+
+app.delete('/api/highscores', async (_req, res) => {
+	try {
+		await pool.query('DELETE FROM game_results')
+		await pool.query('DELETE FROM players')
+		res.json({ message: 'All highscores deleted' })
 	} catch (err) {
 		console.error(err)
 		res.status(500).json({ error: 'Database error' })
