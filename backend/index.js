@@ -3,13 +3,20 @@ const express = require('express')
 const cors = require('cors')
 const { Pool } = require('pg')
 
-const pool = new Pool({
-	user: process.env.DB_USER || 'dci-student',
-	host: process.env.DB_HOST || 'localhost',
-	database: process.env.DB_NAME || 'guess-number',
-	password: process.env.DB_PASSWORD || '',
-	port: Number(process.env.DB_PORT) || 5432,
-})
+// On Render, DATABASE_URL is set automatically (internal URL).
+// Locally, fall back to individual env vars.
+const pool = process.env.DATABASE_URL
+	? new Pool({
+			connectionString: process.env.DATABASE_URL,
+			ssl: { rejectUnauthorized: false },
+	  })
+	: new Pool({
+			user: process.env.DB_USER || 'dci-student',
+			host: process.env.DB_HOST || 'localhost',
+			database: process.env.DB_NAME || 'guess-number',
+			password: process.env.DB_PASSWORD || '',
+			port: Number(process.env.DB_PORT) || 5432,
+	  })
 
 const app = express()
 app.use(cors())
